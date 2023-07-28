@@ -1,4 +1,6 @@
 Liquidity = Balance Sheet - TGA - RR
-Ballance Sheet is WALCL
+
+
+Balance Sheet is WALCL
 TGA is WDTGAL
 RRepo is RRPONTSYD
