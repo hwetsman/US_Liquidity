@@ -6,7 +6,10 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import requests
 import fredapi as fa
+
+
 st. set_page_config(layout="wide")
+
 def Get_Fred_API_Key():
     with open('fredapikey.txt', 'r') as file:
         key = file.readline().strip()
@@ -56,21 +59,12 @@ liquidity_df['WDTGAL']=liquidity_df['WDTGAL'].astype(float)
 liquidity_df.rename(columns={'Date':'DATE'})
 liquidity_df['LIQUIDITY'] = (liquidity_df['WALCL']*1000)-liquidity_df['RRPONTSYD']-(liquidity_df['WDTGAL']*1000)
 
-print(liquidity_df)
-
-# Import data
 url = "https://raw.githubusercontent.com/coinmetrics/data/master/csv/btc.csv"
 btc_df = pd.read_csv(url)
-print(btc_df.tail(1000))
-print(btc_df.columns)
 btc_df = btc_df[['time','PriceUSD']].dropna()
 btc_df.rename(columns={'time':'DATE','PriceUSD':'$BTCUSD'},inplace=True)
 btc_df['DATE'] = pd.to_datetime(btc_df['DATE']).dt.to_period('W').dt.start_time
-print(btc_df)
 price_df = liquidity_df.merge(btc_df, on='DATE',how='inner')
-print(price_df)
-
-
 
 fig = make_subplots(specs=[[{"secondary_y": True}]], subplot_titles=(f'BTC/USD Exchange Rate and Liquidity',))
 fig.add_trace(go.Scatter(x=price_df['DATE'], y=price_df['$BTCUSD'], name='$BTCUSD'), secondary_y=False)
@@ -78,8 +72,6 @@ fig.add_trace(go.Scatter(x=price_df['DATE'], y=price_df['LIQUIDITY'], name='Liqu
 fig.add_trace(go.Scatter(x=price_df['DATE'], y=price_df['WALCL'], name='Fed Balance Sheet'), secondary_y=True)
 fig.add_trace(go.Scatter(x=price_df['DATE'], y=price_df['RRPONTSYD'], name='Over Night RR'), secondary_y=True)
 fig.add_trace(go.Scatter(x=price_df['DATE'], y=price_df['WDTGAL'], name='Treasury Global Acct'), secondary_y=True)
-
-
 fig.update_yaxes(type='log', tickformat='$,.0f', secondary_y=False)
 fig.update_yaxes(type='log', tickformat='$,.0f', secondary_y=True)
 fig.update_layout(showlegend=True, width=1100, height=700)
